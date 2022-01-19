@@ -1,6 +1,8 @@
 # Icy Veins Talent Sequence
 Icy Veins Talent Sequence is an addon for World of Warcraft Classic that adds the ability to import talents by level from the site [icy-veins](https://icy-veins.com/).
 
+https://www.curseforge.com/wow/addons/icy-veins-talent-sequence/
+
 
 ### This is a fork..
 This is a fork of the Addon https://github.com/fusionpit/TalentSequence
