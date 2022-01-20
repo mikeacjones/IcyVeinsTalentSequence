@@ -1,6 +1,11 @@
-* 3.0
+* 3.0.1
+    - Support added for Talented
+    
+* 3.0.0
     - Fixed issues preventing addon from running with TBC Classic + ported to use Icy Veins talent calculator
     
+==== FORKED HERE ====
+
 * 2.0
     - Added support for multiple sequences
 

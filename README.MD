@@ -7,7 +7,13 @@ https://www.curseforge.com/wow/addons/icy-veins-talent-sequence/
 ### This is a fork..
 This is a fork of the Addon https://github.com/fusionpit/TalentSequence
 
-![alt text](https://thumbs.gfycat.com/AcceptableSlimIlsamochadegu-size_restricted.gif "Talent Sequence demo")
+### Preview
+
+
+![alt text](https://i.imgur.com/ksMoCtu.png "Talent Sequence demo")
+
+Compatible with Talented addon!
+![alt text](https://i.imgur.com/Ac5Y2Q0.jpg "Talented Talent Sequence")
 
 ## Importing
 To Import a new sequence, open the Talents panel (default key: N) and press the "&gt;&gt;" button near the close button.  

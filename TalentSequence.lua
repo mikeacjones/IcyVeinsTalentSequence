@@ -1,5 +1,3 @@
-LoadAddOn("Blizzard_TalentUI")
-
 local addonName, ts = ...
 
 local _G = _G
@@ -31,6 +29,7 @@ local SCROLLING_WIDTH = 102
 local NONSCROLLING_WIDTH = 84
 local IMPORT_DIALOG = "TALENTSEQUENCEIMPORTDIALOG"
 local LEVEL_WIDTH = 20
+local UsingTalented = false
 
 IsTalentSequenceExpanded = false
 TalentSequenceTalents = {}
@@ -360,12 +359,17 @@ function ts.CreateImportFrame()
     ts.ImportFrame = sequencesFrame
 end
 
-function ts.CreateMainFrame()
-    local mainFrame = CreateFrame("Frame", nil, PlayerTalentFrame, BackdropTemplateMixin and "BackdropTemplate")
+function ts.CreateMainFrame(talentFrame)
+    local mainFrame = CreateFrame("Frame", nil, _G[talentFrame], BackdropTemplateMixin and "BackdropTemplate")
     mainFrame:SetPoint("CENTER")
     mainFrame:SetSize(128, 128)
-    mainFrame:SetPoint("TOPLEFT", "PlayerTalentFrame", "TOPRIGHT", -36, -12)
-    mainFrame:SetPoint("BOTTOMLEFT", "PlayerTalentFrame", "BOTTOMRIGHT", 0, 72)
+    if (not UsingTalented) then
+        mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", -36, -12)
+        mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "BOTTOMRIGHT", 0, 72)
+    else
+        mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", 0, 0)
+        mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "TOPRIGHT", 0, -450)
+    end
     mainFrame:SetBackdrop({
         bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
@@ -394,9 +398,11 @@ function ts.CreateMainFrame()
     end)
     mainFrame:Hide()
 
-    hooksecurefunc("TalentFrameTab_OnClick", function()
-        if (mainFrame:IsShown()) then ts.UpdateTalentFrame(mainFrame) end
-    end)
+    if (not UsingTalented) then
+        hooksecurefunc("TalentFrameTab_OnClick", function()
+            if (mainFrame:IsShown()) then ts.UpdateTalentFrame(mainFrame) end
+        end)
+    end
 
     local scrollBar = CreateFrame("ScrollFrame", "$parentScrollBar", mainFrame,
                                   "FauxScrollFrameTemplate")
@@ -505,7 +511,7 @@ function ts.CreateMainFrame()
             end
 
             local iconTexture = _G[self.icon:GetName() .. "IconTexture"]
-            if (talent.tab ~= PlayerTalentFrame.selectedTab) then
+            if ((not UsingTalented) and talent.tab ~= PlayerTalentFrame.selectedTab) then
                 iconTexture:SetVertexColor(1.0, 1.0, 1.0, 0.25)
             else
                 iconTexture:SetVertexColor(1.0, 1.0, 1.0, 1.0)
@@ -550,8 +556,12 @@ function ts.CreateMainFrame()
         ts.ImportFrame:Show()
     end)
     local showButton = CreateFrame("Button", "ShowTalentOrderButton",
-                                   PlayerTalentFrame, "UIPanelButtonTemplate")
-    showButton:SetPoint("TOPRIGHT", -62, -18)
+                                   _G[talentFrame], "UIPanelButtonTemplate")
+    if (not UsingTalented) then
+        showButton:SetPoint("TOPRIGHT", -62, -18)
+    else
+        showButton:SetPoint("TOPRIGHT", -100, -10)
+    end
     showButton:SetText(">>")
     if (IsTalentSequenceExpanded) then
         showButton:SetText("<<")
@@ -580,8 +590,8 @@ function ts.CreateMainFrame()
 end
 
 local initRun = false
-local function init()
-    if (initRun) then return end
+local function init(talentFrame)
+    --if (initRun) then return end
     if (not TalentSequenceTalents) then TalentSequenceTalents = {} end
     if (not TalentSequenceSavedSequences) then
         TalentSequenceSavedSequences = {}
@@ -591,26 +601,16 @@ local function init()
     end
     ts.Talents = TalentSequenceTalents
     if (IsTalentSequenceExpanded == 0) then IsTalentSequenceExpanded = false end
-    if (ts.MainFrame == nil) then ts.CreateMainFrame() end
+    if (ts.MainFrame == nil) then ts.CreateMainFrame(talentFrame) end
     initRun = true
 end
 
-local talentSequenceEventFrame = CreateFrame("Frame")
-talentSequenceEventFrame:SetScript("OnEvent", function(self, event, ...)
-    if (event == "ADDON_LOADED" and ... == addonName) then
-        init()
-        self:UnregisterEvent("ADDON_LOADED")
-    end
-    if (event == "PLAYER_LOGIN") then
-        init()
-        self:UnregisterEvent("ADDON_LOADED")
-        self:UnregisterEvent("PLAYER_LOGIN")
+hooksecurefunc("CreateFrame", function(parent, name, ...)
+    if (name == "TalentedFrame") then
+        UsingTalented = true
+        init("TalentedFrame")
     end
 end)
-talentSequenceEventFrame:RegisterEvent("ADDON_LOADED")
-
--- Deja Stats loads the talent ui during its own ADDON_LOADED event,
--- which will prevent our ADDON_LOADED from being fired correctly
-if (IsAddOnLoaded("DejaClassicStats")) then
-    talentSequenceEventFrame:RegisterEvent("PLAYER_LOGIN")
-end
+hooksecurefunc("ToggleTalentFrame", function(...)
+    init("PlayerTalentFrame")
+end)
