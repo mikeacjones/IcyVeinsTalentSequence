@@ -1,5 +1,5 @@
 # 3.1.0
-    -
+    - Patched to support Wow Classic Era
 
 * 3.0.10
     - Solves Talented race condition without force loading Talented
