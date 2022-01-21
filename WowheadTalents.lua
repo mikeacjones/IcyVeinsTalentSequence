@@ -8,7 +8,7 @@ local tinsert = tinsert
 local UnitClass = UnitClass
 local GetTalentInfo = GetTalentInfo
 
-local characterIndices = "abcdefghjkmnpqrstvwzxy"
+local characterIndices = "abcdefghjkmnpqrstvwzxyilou"
 
 ts.WowheadTalents = {}
 
