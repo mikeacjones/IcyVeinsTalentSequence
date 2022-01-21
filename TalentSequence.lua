@@ -168,9 +168,13 @@ function ts:UpdateSequencesFrame()
         end
     end
 
-function ts.CreateImportFrame()
-    local sequencesFrame = CreateFrame("Frame", "TalentSequences", UIParent,
-                                       "BasicFrameTemplateWithInset")
+function ts.CreateImportFrame(talentFrame)
+    local sequencesFrame = nil
+    if (UsingTalented) then 
+        sequencesFrame = CreateFrame("Frame", "TalentSequences", _G[talentFrame], "BasicFrameTemplateWithInset") 
+    else
+        sequencesFrame = CreateFrame("Frame", "TalentSequences", UIParent, "BasicFrameTemplateWithInset")
+    end
     sequencesFrame:Hide()
     sequencesFrame:SetScript("OnShow", function() ts:UpdateSequencesFrame() end)
     sequencesFrame:SetSize(325, 212)
@@ -552,8 +556,12 @@ function ts.CreateMainFrame(talentFrame)
     loadButton:SetText(ts.L.LOAD)
     loadButton:SetHeight(22)
     loadButton:SetScript("OnClick", function()
-        if (ts.ImportFrame == nil) then ts.CreateImportFrame() end
+        if (ts.ImportFrame == nil) then ts.CreateImportFrame(talentFrame) end
         ts.ImportFrame:Show()
+        if (UsingTalented) then
+            ts.ImportFrame:SetFrameLevel(4)
+            ts.ImportFrame:Raise()
+        end
     end)
     local showButton = CreateFrame("Button", "ShowTalentOrderButton",
                                    _G[talentFrame], "UIPanelButtonTemplate")
@@ -591,7 +599,7 @@ end
 
 local initRun = false
 local function init(talentFrame)
-    --if (initRun) then return end
+    if (initRun) then return end
     if (not TalentSequenceTalents) then TalentSequenceTalents = {} end
     if (not TalentSequenceSavedSequences) then
         TalentSequenceSavedSequences = {}
@@ -606,11 +614,13 @@ local function init(talentFrame)
 end
 
 hooksecurefunc("CreateFrame", function(parent, name, ...)
+    if (initRun) then return end
     if (name == "TalentedFrame") then
         UsingTalented = true
         init("TalentedFrame")
     end
 end)
 hooksecurefunc("ToggleTalentFrame", function(...)
+    if (initRun) then return end
     init("PlayerTalentFrame")
 end)
