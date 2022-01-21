@@ -1,3 +1,6 @@
+* 3.0.9
+    - Fix race condition when attaching to Talented
+
 * 3.0.7
     - Show button not being set corrected if hidden when first loading
 

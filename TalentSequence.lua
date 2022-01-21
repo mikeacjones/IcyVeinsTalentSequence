@@ -621,15 +621,25 @@ local function init(talentFrame)
     initRun = true
 end
 
-hooksecurefunc("CreateFrame", function(parent, name, ...)
-    if (initRun) then return end
-    if (name == "TalentedFrame") then
-        UsingTalented = true
-        init("TalentedFrame")
+local _,_,_,talented_loadable, talented_error = GetAddOnInfo("Talented")
+if talented_loadable and not (talented_error == "MISSING" or talented_error == "DISABLED") then
+    if GetAddOnEnableState((GetUnitName("player")),"Talented") == 2 then
+        local talentedLoaded = IsAddOnLoaded("Talented")
+        if (not talentedLoaded) then LoadAddOn("Talented") end
+        local Talented = LibStub("AceAddon-3.0"):GetAddon("Talented",true)
+        Talented = LibStub("AceAddon-3.0"):GetAddon("Talented",true)
+        if Talented then
+            hooksecurefunc(Talented, "ToggleTalentFrame", function()
+                if (initRun) then return end
+                UsingTalented = true
+                init("TalentedFrame")
+            end)
+        end
     end
-end)
-hooksecurefunc("ToggleTalentFrame", function(...)
-    if (PlayerTalentFrame == nil) then return end
-    if (initRun) then return end
-    init("PlayerTalentFrame")
-end)
+else
+    hooksecurefunc("ToggleTalentFrame", function(...)
+        if (PlayerTalentFrame == nil) then return end
+        if (initRun) then return end
+        init("PlayerTalentFrame")
+    end)
+end
