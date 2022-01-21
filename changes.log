@@ -1,3 +1,6 @@
+* 3.0.10
+    - Solves Talented race condition without force loading Talented
+
 * 3.0.9
     - Fix race condition when attaching to Talented
 
