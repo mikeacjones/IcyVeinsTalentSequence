@@ -25,8 +25,7 @@ In the pop-out frame, press the "Load" button at the bottom.  In the pop-up Tale
 
 If your icy-veins URL is `https://www.icy-veins.com/tbc-classic/mage-talent-calculator#tc-KKKKKLLLNNNROOQVVVVVMMMMMQQUUX._____~~~~[~U0011155555TT-----Z`
 
-Paste in `KKKKKLLLNNNROOQVVVVVMMMMMQQUUX._____~~~~[~U0011155555TT-----Z`
-
+Just paste thet entire thing in!
 
 ![The image shows the first step of the import process, which is pasting the generated url into a pop-up window](https://i.imgur.com/DUJh59v.png "Pasting URL")
 Give your sequence a name and press the Enter key to save it.  
