@@ -1,44 +1,71 @@
-# Icy Veins Talent Sequence
-Icy Veins Talent Sequence is an addon for World of Warcraft Classic that adds the ability to import talents by level from the site [icy-veins](https://icy-veins.com/).
+# Talent Sequence 2
 
-https://www.curseforge.com/wow/addons/icy-veins-talent-sequence/
+Table of contents:
+- [Talent Sequence 2](#talent-sequence-2)
+  - [What It Is](#what-it-is)
+  - [Supports](#supports)
+  - [Origins](#origins)
+    - [In-Game Previews](#in-game-previews)
+        - [*Blizzard Talent Frame*](#blizzard-talent-frame)
+      - [*Talented Addon Support*](#talented-addon-support)
+    - [How-To](#how-to)
+      - [*Add Icy Veins Talent Sequence*](#add-icy-veins-talent-sequence)
+      - [*Add WowHead Talent Sequence*](#add-wowhead-talent-sequence)
+
+## What It Is
+
+Talent Sequence 2 is a WoW AddOn for TBC Classic that allows you to display a the talent sequence you've built in various web-based talent calculators side-by-side the in game talent window.
+
+## Supports
+
+* Icy Veins TBC Talent Calculator
+* WowHead TBC Talent Calculator
+* Hooks into Talented AddOn if you are using it
+
+## Origins
+
+This AddOn is a fork of the original [Talent Sequence](https://www.curseforge.com/wow/addons/talent-sequence/
+) AddOn. With the death of bobos talents, the AddOn became essentially unusable. This fork breaths new life into the AddOn making the following changes:
 
 
-### This is a fork..
-This is a fork of the Addon https://github.com/fusionpit/TalentSequence
+### In-Game Previews
 
-### Preview
+##### *Blizzard Talent Frame*
 
+![Blizzard frame displaying Talent Sequence 2](https://i.imgur.com/ThW7UOQ.png)
 
-![alt text](https://i.imgur.com/ksMoCtu.png "Talent Sequence demo")
+#### *Talented Addon Support*
 
-Compatible with Talented addon!
-![alt text](https://i.imgur.com/Ac5Y2Q0.jpg "Talented Talent Sequence")
+![Talented frame displaying Talent Sequence 2](https://i.imgur.com/ul4kLXV.png)
 
-## Importing
+### How-To
 
-#### Now also supports WowHead!
+#### *Add Icy Veins Talent Sequence*
 
-To Import a new sequence, open the Talents panel (default key: N) and press the "&gt;&gt;" button near the close button.  
-![The image shows the location of the toggle button for the AddOn](https://i.imgur.com/BSh7rOy.png "Toggling main window")
+* Build your talent sequence in the Icy Veins TBC calculator. Alternatively, use a prebuilt sequence.
+   * When using a linked or embedded sequence (eg: the Icy Veins leveling guides), verify that the sequence in the calculator actually includes the talent order. If the calculator was embedded, you should see buttons that allow you to step through the point distribution. This isn't necessary when building the spec yourself as the order is maintained by default. ![talent step buttons](https://i.imgur.com/MT02brt.png)
+* Copy the entire Icy Veins talent calcluator URL
+* In-game, open your Talent window, and click `Talent Sequence >>`
+* Click the `Load` button
+* Paste the Icy Veins talent calculator URL and load
+* Name the sequence and hit enter
+* Click the now available button in order to set your talent sequence
+* Go level and earn talent points!
 
-In the pop-out frame, press the "Load" button at the bottom.  In the pop-up Talent Sequences window, press the "Import" button at the bottom.  In the next pop-up, paste your [icy-veins](https://icy-veins.com/) talent string into the box and press the Enter key.
+![screenshot](https://i.imgur.com/dZAMbix.png)
+![screenshot](https://i.imgur.com/3BZAal9.png)
 
-### Example
+#### *Add WowHead Talent Sequence*
 
-If your icy-veins URL is `https://www.icy-veins.com/tbc-classic/mage-talent-calculator#tc-KKKKKLLLNNNROOQVVVVVMMMMMQQUUX._____~~~~[~U0011155555TT-----Z`
+* Build your talent sequence in the WowHead TBC calculator. Alternatively, use a prebuilt sequence.
+   * Ensure that you have the Talent Order enabled. In the calculator window, you must expand the Talent Order tab and keep it open, or WowHead will not maintain the talent sequence. The import will NOT work if this tab is not open and showing your talent sequence ![wowhead talent calculator screenshot](https://i.imgur.com/LPBe091.png)
+* Copy the entire WowHead talent calcluator URL
+* In-game, open your Talent window, and click `Talent Sequence >>`
+* Click the `Load` button
+* Paste the WowHead talent calculator URL and load
+* Name the sequence and hit enter
+* Click the now available button in order to set your talent sequence
+* Go level and earn talent points!
 
-Just paste thet entire thing in!
-
-![The image shows the first step of the import process, which is pasting the generated url into a pop-up window](https://i.imgur.com/DUJh59v.png "Pasting URL")
-Give your sequence a name and press the Enter key to save it.  
-![The image shows the default behavior for naming when importing a new sequence](https://i.imgur.com/QWxV3aG.png "Default name")
-![The image shows user supplied text in the text input](https://i.imgur.com/RIkJt66.png "New name entered")
-![The image shows the first button being renamed with the user supplied text](https://i.imgur.com/4l62nKw.png "New button name")
-
-## Operations
-Clicking the cogwheel will allow you to rename the sequence.  Press the Enter key after typing the new name to save it.  
-![The image shows the tooltip displayed when hovering over the icon to rename the sequence](https://i.imgur.com/Dub1Qyx.png "Rename icon")
-
-Holding Shift and clicking the general prohibition sign will delete the sequence.  
-![The image shows the tooltip displayed when hovering over the icon to delete the sequence](https://i.imgur.com/F0UKQj8.png "Delete icon")
+![screenshot](https://i.imgur.com/dZAMbix.png)
+![screenshot](https://i.imgur.com/3BZAal9.png)
