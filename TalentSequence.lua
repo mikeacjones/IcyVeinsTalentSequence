@@ -579,7 +579,7 @@ function ts.CreateMainFrame(talentFrame)
     else
         showButton:SetPoint("TOPRIGHT", -100, -4)
     end
-    showButton:SetText(">>")
+    showButton:SetText("  Talent Sequence >>  ")
     if (IsTalentSequenceExpanded) then
         showButton:SetText("  Talent Sequence <<  ")
         mainFrame:Show()
