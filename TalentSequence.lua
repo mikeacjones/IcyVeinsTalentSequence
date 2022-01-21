@@ -383,14 +383,14 @@ function ts.CreateMainFrame(talentFrame)
         mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "TOPRIGHT", 0, -450)
     end
     mainFrame:SetBackdrop({
-        bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+        bgFile = "Interface\\FrameGeneral\\UI-Background-Marble",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
         tile = true,
         tileSize = 16,
         edgeSize = 16,
         insets = {left = 4, right = 4, top = 4, bottom = 4}
     })
-    mainFrame:SetBackdropColor(0, 0, 1, .5)
+    mainFrame:SetBackdropColor(0, 0, 0, 1)
     mainFrame:SetScript("OnShow", function(self)
         ts.ScrollFirstUnlearnedTalentIntoView(self)
     end)
@@ -574,13 +574,14 @@ function ts.CreateMainFrame(talentFrame)
     local showButton = CreateFrame("Button", "ShowTalentOrderButton",
                                    _G[talentFrame], "UIPanelButtonTemplate")
     if (not UsingTalented) then
-        showButton:SetPoint("TOPRIGHT", -62, -18)
+        showButton:SetPoint("TOPRIGHT", -120, -16)
+        showButton:SetHeight(18)
     else
-        showButton:SetPoint("TOPRIGHT", -100, -10)
+        showButton:SetPoint("TOPRIGHT", -100, -4)
     end
     showButton:SetText(">>")
     if (IsTalentSequenceExpanded) then
-        showButton:SetText("<<")
+        showButton:SetText("  Talent Sequence <<  ")
         mainFrame:Show()
     end
     showButton.tooltip = ts.L.TOGGLE
@@ -588,10 +589,10 @@ function ts.CreateMainFrame(talentFrame)
         IsTalentSequenceExpanded = not IsTalentSequenceExpanded
         if (IsTalentSequenceExpanded) then
             mainFrame:Show()
-            self:SetText("<<")
+            self:SetText("  Talent Sequence <<  ")
         else
             mainFrame:Hide()
-            self:SetText(">>")
+            self:SetText("  Talent Sequence >>  ")
         end
     end)
     showButton:SetScript("OnEnter", function(self)
@@ -600,7 +601,6 @@ function ts.CreateMainFrame(talentFrame)
         tooltip:Show()
     end)
     showButton:SetScript("OnLeave", function() tooltip:Hide() end)
-    showButton:SetHeight(14)
     showButton:SetWidth(showButton:GetTextWidth() + 10)
     ts.MainFrame = mainFrame
 end
