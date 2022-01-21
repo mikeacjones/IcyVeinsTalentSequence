@@ -378,18 +378,27 @@ function ts.CreateMainFrame(talentFrame)
     if (not UsingTalented) then
         mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", -36, -12)
         mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "BOTTOMRIGHT", 0, 72)
+        mainFrame:SetBackdrop({
+            bgFile = "Interface\\FrameGeneral\\UI-Background-Marble",
+            edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+            tile = true,
+            tileSize = 16,
+            edgeSize = 16,
+            insets = {left = 4, right = 4, top = 4, bottom = 4}
+        })
     else
         mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", 0, 0)
         mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "TOPRIGHT", 0, -450)
+        mainFrame:SetBackdrop({
+	    bgFile = "Interface\\FrameGeneral\\UI-Background-Marble",
+	    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+	    tile = true,
+	    tileEdge = true,
+	    tileSize = 16,
+	    edgeSize = 16,
+	    insets = { left = 3, right = 5, top = 3, bottom = 5 },
+        })
     end
-    mainFrame:SetBackdrop({
-        bgFile = "Interface\\FrameGeneral\\UI-Background-Marble",
-        edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
-        tile = true,
-        tileSize = 16,
-        edgeSize = 16,
-        insets = {left = 4, right = 4, top = 4, bottom = 4}
-    })
     mainFrame:SetBackdropColor(0, 0, 0, 1)
     mainFrame:SetScript("OnShow", function(self)
         ts.ScrollFirstUnlearnedTalentIntoView(self)
@@ -621,15 +630,22 @@ local function init(talentFrame)
     initRun = true
 end
 
-hooksecurefunc("CreateFrame", function(parent, name, ...)
-    if (initRun) then return end
-    if (name == "TalentedFrame") then
-        UsingTalented = true
-        init("TalentedFrame")
+local _,_,_,talented_loadable, talented_error = GetAddOnInfo("Talented")
+if talented_loadable and not (talented_error == "MISSING" or talented_error == "DISABLED") then
+    if GetAddOnEnableState((GetUnitName("player")),"Talented") == 2 then
+        local Talented = LibStub("AceAddon-3.0"):GetAddon("Talented",true)
+        if Talented then
+            hooksecurefunc(Talented, "ToggleTalentFrame", function()
+                if (initRun) then return end
+                UsingTalented = true
+                init("TalentedFrame")
+            end)
+        end
+    else
+        hooksecurefunc("ToggleTalentFrame", function(...)
+            if (PlayerTalentFrame == nil) then return end
+            if (initRun) then return end
+            init("PlayerTalentFrame")
+        end)
     end
-end)
-hooksecurefunc("ToggleTalentFrame", function(...)
-    if (PlayerTalentFrame == nil) then return end
-    if (initRun) then return end
-    init("PlayerTalentFrame")
-end)
+end
