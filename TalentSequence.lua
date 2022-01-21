@@ -16,6 +16,7 @@ local FauxScrollFrame_Update = FauxScrollFrame_Update
 local hooksecurefunc = hooksecurefunc
 local format = format
 local ceil = ceil
+local strfind = strfind
 local GREEN_FONT_COLOR = GREEN_FONT_COLOR
 local NORMAL_FONT_COLOR = NORMAL_FONT_COLOR
 local RED_FONT_COLOR = RED_FONT_COLOR
@@ -128,7 +129,14 @@ local function InsertSequence(talentSequence)
 end
 
 function ts:ImportTalents(talentsString)
-    local talents = ts.IcyVeinsTalents.GetTalents(talentsString)
+    local talents = {}
+    local isWowhead = strfind(talentsString,"wowhead")
+    local talents = nil
+    if (isWowhead) then 
+        talents = ts.WowheadTalents.GetTalents(talentsString)
+    else
+        talents = ts.IcyVeinsTalents.GetTalents(talentsString)
+    end
     if (talents == nil) then return end
     InsertSequence(talents)
     if (self.ImportFrame and self.ImportFrame:IsShown()) then

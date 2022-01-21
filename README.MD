@@ -16,6 +16,9 @@ Compatible with Talented addon!
 ![alt text](https://i.imgur.com/Ac5Y2Q0.jpg "Talented Talent Sequence")
 
 ## Importing
+
+#### Now also supports WowHead!
+
 To Import a new sequence, open the Talents panel (default key: N) and press the "&gt;&gt;" button near the close button.  
 ![The image shows the location of the toggle button for the AddOn](https://i.imgur.com/BSh7rOy.png "Toggling main window")
 
