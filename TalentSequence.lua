@@ -614,6 +614,7 @@ local function init(talentFrame)
 end
 
 hooksecurefunc("CreateFrame", function(parent, name, ...)
+    if (_G["TalentedFrame"] == nil) then return end
     if (initRun) then return end
     if (name == "TalentedFrame") then
         UsingTalented = true
@@ -621,6 +622,7 @@ hooksecurefunc("CreateFrame", function(parent, name, ...)
     end
 end)
 hooksecurefunc("ToggleTalentFrame", function(...)
+    if (PlayerTalentFrame == nil) then return end
     if (initRun) then return end
     init("PlayerTalentFrame")
 end)

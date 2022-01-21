@@ -1,3 +1,7 @@
+* 3.0.3
+    - You can now paste either just the talents, or the entire icy-veins URL
+    - Fixed bug that throws error if you try and open the talent window on a character with a level lower than 10
+
 * 3.0.2
     - Fixed bug where talent sequence management window open under Talented
     

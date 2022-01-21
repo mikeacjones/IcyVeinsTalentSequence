@@ -51,6 +51,11 @@ local talentMap = {
 ts.IcyVeinsTalents = {}
 
 function ts.IcyVeinsTalents.GetTalents(talentString)
+    local talentString = talentString
+    local location = strfind(talentString,"#tc-")
+    if (location) then
+        talentString = strsub(talentString,location+4)
+    end
     --- workaround for problematic characters
     talentString = talentString:gsub("%[", "+")
     talentString = talentString:gsub("%.", "*")
