@@ -128,14 +128,27 @@ local function InsertSequence(talentSequence)
             {name = "<unnamed>", talents = talentSequence, points = points})
 end
 
+local function GetTalentDictionary()
+  local dict = {}
+  for i = 1, GetNumTalentTabs() do
+    for j = 1, GetNumTalents(i) do
+      local name, icon, row, column, currentRank, maxRank = GetTalentInfo(i, j)
+      table.insert(dict, { name = name, icon = icon, currentRank = currentRank, maxRank = maxRank, index = j, tab = i, row = row, column = column })
+    end
+  end
+  table.sort(dict, function (k1, k2) return (k1.tab < k2.tab or (k1.tab == k2.tab and k1.row < k2.row) or (k1.tab == k2.tab and k1.row == k2.row and k1.column < k2.column)) end)
+  return dict
+end
+
 function ts:ImportTalents(talentsString)
     local talents = {}
     local isWowhead = strfind(talentsString,"wowhead")
     local talents = nil
+    local talentDict = GetTalentDictionary()
     if (isWowhead) then 
-        talents = ts.WowheadTalents.GetTalents(talentsString)
+        talents = ts.WowheadTalents.GetTalents(talentsString, talentDict)
     else
-        talents = ts.IcyVeinsTalents.GetTalents(talentsString)
+        talents = ts.IcyVeinsTalents.GetTalents(talentsString, talentDict)
     end
     if (talents == nil) then return end
     InsertSequence(talents)
@@ -399,6 +412,7 @@ function ts.CreateMainFrame(talentFrame)
 	    insets = { left = 3, right = 5, top = 3, bottom = 5 },
         })
     end
+    
     mainFrame:SetBackdropColor(0, 0, 0, 1)
     mainFrame:SetScript("OnShow", function(self)
         ts.ScrollFirstUnlearnedTalentIntoView(self)
@@ -417,13 +431,8 @@ function ts.CreateMainFrame(talentFrame)
             ts.UpdateTalentFrame(self)
         end
     end)
+    
     mainFrame:Hide()
-
-    if (not UsingTalented) then
-        hooksecurefunc("TalentFrameTab_OnClick", function()
-            if (mainFrame:IsShown()) then ts.UpdateTalentFrame(mainFrame) end
-        end)
-    end
 
     local scrollBar = CreateFrame("ScrollFrame", "$parentScrollBar", mainFrame,
                                   "FauxScrollFrameTemplate")
@@ -532,11 +541,7 @@ function ts.CreateMainFrame(talentFrame)
             end
 
             local iconTexture = _G[self.icon:GetName() .. "IconTexture"]
-            if ((not UsingTalented) and talent.tab ~= PlayerTalentFrame.selectedTab) then
-                iconTexture:SetVertexColor(1.0, 1.0, 1.0, 0.25)
-            else
-                iconTexture:SetVertexColor(1.0, 1.0, 1.0, 1.0)
-            end
+            iconTexture:SetVertexColor(1.0, 1.0, 1.0, 1.0)
 
             self.level.label:SetText(talent.level)
             local playerLevel = UnitLevel("player")

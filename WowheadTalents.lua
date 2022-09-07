@@ -17,7 +17,7 @@ local function findLast(haystack, needle)
     if i==nil then return nil else return i-1 end
 end
 
-function ts.WowheadTalents.GetTalents(talentString)
+function ts.WowheadTalents.GetTalents(talentString, talentDict)
     local startPosition = findLast(talentString, "/")
     if (startPosition) then
         talentString = strsub(talentString,startPosition+1)
@@ -30,24 +30,24 @@ function ts.WowheadTalents.GetTalents(talentString)
     local talentCounter = {}
     for i = 1, talentStringLength, 1 do
         local encodedId = strsub(talentString, i, i)
-        if (strbyte(encodedId) <= 50) then
+        if (strbyte(encodedId) <= 50 and strbyte(encodedId) >= 48) then
             currentTab = encodedId
         else
             local talentIndex = strfind(characterIndices,strlower(encodedId))
+            if (strbyte(encodedId) > 51 and strbyte(encodedId) < 58 and mod(encodedId,2) == 1) then
+              talentIndex = strfind(characterIndices, encodedId -1)
+            end
+            local talent = talentDict[talentIndex]
             --wow head says to max out the talent if its in caps
             if ((strbyte(encodedId) < 97 and strbyte(encodedId) > 64) or (strbyte(encodedId) > 51 and strbyte(encodedId) < 58 and mod(encodedId,2) == 1)) then
-                if (strbyte(encodedId) > 51 and strbyte(encodedId) < 58) then
-                    encodedId = encodedId - 1
-                end
-                local name, icon, _, _, currentRank, maxRank = GetTalentInfo(currentTab + 1, talentIndex)
-                for j = 1, maxRank, 1 do
+                for j = 1, talent.maxRank, 1 do
                     level = level + 1
                     tinsert(talents,
                     {
-                        tab = currentTab + 1,
+                        tab = talent.tab,
                         id = encodedId,
                         level = level,
-                        index = talentIndex,
+                        index = talent.index,
                         rank = j
                     })
                 end
@@ -63,7 +63,7 @@ function ts.WowheadTalents.GetTalents(talentString)
                     tab = currentTab + 1,
                     id = encodedId,
                     level = level,
-                    index = talentIndex,
+                    index = talent.index,
                     rank = talentCounter[encodedId]
                 })
             end
