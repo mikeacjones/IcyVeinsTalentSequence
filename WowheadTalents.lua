@@ -8,7 +8,8 @@ local tinsert = tinsert
 local UnitClass = UnitClass
 local GetTalentInfo = GetTalentInfo
 
-local characterIndices = "abcdefghjkmnpqrstvwzxyilou468-"
+local talentIndices = "abcdefghjkmnpqrstvwzxyilou468-~"
+local maxTalentIndices = "ABCDEFGHJKMNPQRSTVWZXYILOU579_"
 
 ts.WowheadTalents = {}
 
@@ -30,16 +31,13 @@ function ts.WowheadTalents.GetTalents(talentString, talentDict)
     local talentCounter = {}
     for i = 1, talentStringLength, 1 do
         local encodedId = strsub(talentString, i, i)
-        if (strbyte(encodedId) <= 50 and strbyte(encodedId) >= 48) then
+        if (encodedId == "0" or encodedId == "1" or encodedId == "2") then
             currentTab = encodedId
         else
-            local talentIndex = strfind(characterIndices,strlower(encodedId))
-            if (strbyte(encodedId) > 51 and strbyte(encodedId) < 58 and mod(encodedId,2) == 1) then
-              talentIndex = strfind(characterIndices, encodedId -1)
-            end
-            local talent = talentDict[talentIndex]
-            --wow head says to max out the talent if its in caps
-            if ((strbyte(encodedId) < 97 and strbyte(encodedId) > 64) or (strbyte(encodedId) > 51 and strbyte(encodedId) < 58 and mod(encodedId,2) == 1)) then
+            local talentIndex = strfind(talentIndices,encodedId)
+            local maxTalentIndex = strfind(maxTalentIndices,encodedId)
+            if talentIndex == nil then
+                local talent = talentDict[currentTab+1][maxTalentIndex]
                 for j = 1, talent.maxRank, 1 do
                     level = level + 1
                     tinsert(talents,
@@ -52,6 +50,7 @@ function ts.WowheadTalents.GetTalents(talentString, talentDict)
                     })
                 end
             else
+                local talent = talentDict[currentTab+1][talentIndex]
                 level = level + 1
                 if (talentCounter[encodedId] == nil) then
                     talentCounter[encodedId] = 1

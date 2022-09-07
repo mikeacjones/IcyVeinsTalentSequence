@@ -129,27 +129,32 @@ local function InsertSequence(talentSequence)
 end
 
 local function GetTalentDictionary()
-  local dict = {}
+  local tabOne = {}
+  local tabTwo = {}
+  local tabThree = {}
+  local dict = { tabOne, tabTwo, tabThree }
   for i = 1, GetNumTalentTabs() do
     for j = 1, GetNumTalents(i) do
       local name, icon, row, column, currentRank, maxRank = GetTalentInfo(i, j)
-      table.insert(dict, { name = name, icon = icon, currentRank = currentRank, maxRank = maxRank, index = j, tab = i, row = row, column = column })
+      table.insert(dict[i], { name = name, icon = icon, currentRank = currentRank, maxRank = maxRank, index = j, tab = i, row = row, column = column })
     end
   end
-  table.sort(dict, function (k1, k2) return (k1.tab < k2.tab or (k1.tab == k2.tab and k1.row < k2.row) or (k1.tab == k2.tab and k1.row == k2.row and k1.column < k2.column)) end)
+  table.sort(dict[1], function (k1, k2) return (k1.row < k2.row or (k1.row == k2.row and k1.column < k2.column)) end)
+  table.sort(dict[2], function (k1, k2) return (k1.row < k2.row or (k1.row == k2.row and k1.column < k2.column)) end)
+  table.sort(dict[3], function (k1, k2) return (k1.row < k2.row or (k1.row == k2.row and k1.column < k2.column)) end)
   return dict
 end
 
 function ts:ImportTalents(talentsString)
     local talents = {}
-    local isWowhead = strfind(talentsString,"wowhead")
+    --local isWowhead = strfind(talentsString,"wowhead")
     local talents = nil
     local talentDict = GetTalentDictionary()
-    if (isWowhead) then 
+    --if (isWowhead) then 
         talents = ts.WowheadTalents.GetTalents(talentsString, talentDict)
-    else
-        talents = ts.IcyVeinsTalents.GetTalents(talentsString, talentDict)
-    end
+    --else
+    --    talents = ts.IcyVeinsTalents.GetTalents(talentsString, talentDict)
+    --end
     if (talents == nil) then return end
     InsertSequence(talents)
     if (self.ImportFrame and self.ImportFrame:IsShown()) then
