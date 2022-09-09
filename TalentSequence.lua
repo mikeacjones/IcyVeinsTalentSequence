@@ -405,8 +405,8 @@ function ts.CreateMainFrame(talentFrame)
             insets = {left = 4, right = 4, top = 4, bottom = 4}
         })
     else
-        mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", 0, 0)
-        mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "TOPRIGHT", 0, -450)
+        mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", 35, 0)
+        mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "TOPRIGHT", 35, -450)
         mainFrame:SetBackdrop({
 	    bgFile = "Interface\\FrameGeneral\\UI-Background-Marble",
 	    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
