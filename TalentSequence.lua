@@ -23,7 +23,7 @@ local RED_FONT_COLOR = RED_FONT_COLOR
 local GRAY_FONT_COLOR = GRAY_FONT_COLOR
 
 local TALENT_ROW_HEIGHT = 38
-local MAX_TALENT_ROWS = 10
+local MAX_TALENT_ROWS = 7
 local SEQUENCES_ROW_HEIGHT = 26
 local MAX_SEQUENCE_ROWS = 5
 local SCROLLING_WIDTH = 102
@@ -394,8 +394,8 @@ function ts.CreateMainFrame(talentFrame)
     mainFrame:SetPoint("CENTER")
     mainFrame:SetSize(128, 128)
     if (not UsingTalented) then
-        mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", 40, -12)
-        mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "BOTTOMRIGHT", 0, 32)
+        mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", 0, -130)
+        mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "BOTTOMRIGHT", 0, 18)
         mainFrame:SetBackdrop({
             bgFile = "Interface\\FrameGeneral\\UI-Background-Marble",
             edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
