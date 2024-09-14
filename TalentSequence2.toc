@@ -1,10 +1,10 @@
-## Interface: 30400
+## Interface: 40400
 ## Title: Talent Sequence 2
-## Version: 3.2.2
+## Version: 4.0.0
 ## Author: Moregelen, Sveng
 ## Notes: Shows what order you should spend talent points in, based on Icy Veins or WowHead talent calculators. This TBC Classic compatible remake was forked from the original Talent Sequence addon
 ## SavedVariablesPerCharacter: IsTalentSequenceExpanded, TalentSequenceTalents, TalentSequenceSavedSequences
-## X-Testers: /u/thisisverytricky
+## X-Testers: /u/thisisreallytricky
 ## X-Curse-Project-ID: 570281
 ## X-WoWI-ID: 26216
 

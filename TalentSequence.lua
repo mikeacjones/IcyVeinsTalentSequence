@@ -394,8 +394,8 @@ function ts.CreateMainFrame(talentFrame)
     mainFrame:SetPoint("CENTER")
     mainFrame:SetSize(128, 128)
     if (not UsingTalented) then
-        mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", -36, -12)
-        mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "BOTTOMRIGHT", 0, 72)
+        mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", 40, -12)
+        mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "BOTTOMRIGHT", 0, 32)
         mainFrame:SetBackdrop({
             bgFile = "Interface\\FrameGeneral\\UI-Background-Marble",
             edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
@@ -406,7 +406,7 @@ function ts.CreateMainFrame(talentFrame)
         })
     else
         mainFrame:SetPoint("TOPLEFT", talentFrame, "TOPRIGHT", 35, 0)
-        mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "TOPRIGHT", 35, -450)
+        mainFrame:SetPoint("BOTTOMLEFT", talentFrame, "TOPRIGHT", 35, -550)
         mainFrame:SetBackdrop({
 	    bgFile = "Interface\\FrameGeneral\\UI-Background-Marble",
 	    edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
@@ -442,7 +442,7 @@ function ts.CreateMainFrame(talentFrame)
     local scrollBar = CreateFrame("ScrollFrame", "$parentScrollBar", mainFrame,
                                   "FauxScrollFrameTemplate")
     scrollBar:SetPoint("TOPLEFT", 0, -8)
-    scrollBar:SetPoint("BOTTOMRIGHT", -30, 8)
+    scrollBar:SetPoint("BOTTOMRIGHT", 0, 8)
     scrollBar:SetScript("OnVerticalScroll", function(self, offset)
         FauxScrollFrame_OnVerticalScroll(self, offset, TALENT_ROW_HEIGHT,
                                          function()
@@ -593,7 +593,7 @@ function ts.CreateMainFrame(talentFrame)
     local showButton = CreateFrame("Button", "ShowTalentOrderButton",
                                    _G[talentFrame], "UIPanelButtonTemplate")
     if (not UsingTalented) then
-        showButton:SetPoint("TOPRIGHT", -120, -16)
+        showButton:SetPoint("TOPRIGHT", -50, -30)
         showButton:SetHeight(18)
     else
         showButton:SetPoint("TOPRIGHT", -100, -4)
