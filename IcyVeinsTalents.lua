@@ -81,6 +81,9 @@ function ts.IcyVeinsTalents.GetTalents(talentString, talentDict)
         if talentIndex then
             local talent = flatTalentDict[talentIndex]
             level = level + 1
+            if (level > 10 and level % 2 == 0 and level < 81) then
+                level = level + 1
+            end
             if (talentCounter[talentKey] == nil) then
                 talentCounter[talentKey] = 1
             else

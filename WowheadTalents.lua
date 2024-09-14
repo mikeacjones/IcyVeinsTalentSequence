@@ -40,6 +40,9 @@ function ts.WowheadTalents.GetTalents(talentString, talentDict)
                 local talent = talentDict[currentTab+1][maxTalentIndex]
                 for j = 1, talent.maxRank, 1 do
                     level = level + 1
+                    if (level > 10 and level % 2 == 0 and level < 81) then
+                        level = level + 1
+                    end
                     tinsert(talents,
                     {
                         tab = talent.tab,
@@ -52,6 +55,9 @@ function ts.WowheadTalents.GetTalents(talentString, talentDict)
             else
                 local talent = talentDict[currentTab+1][talentIndex]
                 level = level + 1
+                if (level > 10 and level % 2 == 0 and level < 81) then
+                    level = level + 1
+                end
                 if (talentCounter[encodedId] == nil) then
                     talentCounter[encodedId] = 1
                 else
