@@ -129,28 +129,28 @@ local function InsertSequence(talentSequence)
 end
 
 local function GetTalentDictionary()
-    local tabOne = {}
-    local tabTwo = {}
-    local tabThree = {}
-    local dict = { tabOne, tabTwo, tabThree }
-    for i = 1, GetNumTalentTabs() do
-      for j = 1, GetNumTalents(i) do
-        local name, icon, row, column, currentRank, maxRank = GetTalentInfo(i, j)
-        talent = { name = name, icon = icon, currentRank = currentRank, maxRank = maxRank, index = j, tab = i, row = row, column = column }
-        if talent.name then
-          table.insert(dict[i], talent)
-        end
+  local tabOne = {}
+  local tabTwo = {}
+  local tabThree = {}
+  local dict = { tabOne, tabTwo, tabThree }
+  for i = 1, GetNumTalentTabs() do
+    for j = 1, GetNumTalents(i) do
+      local name, icon, row, column, currentRank, maxRank = GetTalentInfo(i, j)
+      talent = { name = name, icon = icon, currentRank = currentRank, maxRank = maxRank, index = j, tab = i, row = row, column = column }
+      if talent.name then
+        table.insert(dict[i], talent)
       end
     end
-    table.sort(dict[1], function (k1, k2) return (k1.row < k2.row or (k1.row == k2.row and k1.column < k2.column)) end)
-    table.sort(dict[2], function (k1, k2) return (k1.row < k2.row or (k1.row == k2.row and k1.column < k2.column)) end)
-    table.sort(dict[3], function (k1, k2) return (k1.row < k2.row or (k1.row == k2.row and k1.column < k2.column)) end)
-    for i = 1, GetNumTalentTabs() do
-      for j = 1, GetNumTalents(i) do
-        talent = dict[i][j]
-      end
+  end
+  table.sort(dict[1], function (k1, k2) return (k1.row < k2.row or (k1.row == k2.row and k1.column < k2.column)) end)
+  table.sort(dict[2], function (k1, k2) return (k1.row < k2.row or (k1.row == k2.row and k1.column < k2.column)) end)
+  table.sort(dict[3], function (k1, k2) return (k1.row < k2.row or (k1.row == k2.row and k1.column < k2.column)) end)
+  for i = 1, GetNumTalentTabs() do
+    for j = 1, GetNumTalents(i) do
+      talent = dict[i][j]
     end
-    return dict
+  end
+  return dict
 end
 
 function ts:ImportTalents(talentsString)
@@ -497,7 +497,9 @@ function ts.CreateMainFrame(talentFrame)
         icon:SetScript("OnEnter", function(self)
             if (not self.tooltip) then return end
             tooltip:SetOwner(self, "ANCHOR_RIGHT")
-            tooltip:SetText(self.tooltip, nil, nil, nil, nil, true)
+            tooltip:SetTalent(self.talentTab, self.talentIndex)
+            tooltip:AddLine(" ", nil, nil, nil)
+            tooltip:AddLine(self.tooltip, nil, nil, nil)
             tooltip:Show()
         end)
         icon:SetScript("OnLeave", function() tooltip:Hide() end)
@@ -536,8 +538,11 @@ function ts.CreateMainFrame(talentFrame)
 
             SetItemButtonTexture(self.icon, icon)
             local tabName = GetTalentTabInfo(talent.tab)
-            self.icon.tooltip = format("%s (%d/%d) - %s", name, talent.rank,
+            local link = GetTalentLink(talent.tab, talent.index, false, nil)
+            self.icon.tooltip = format("Train %s to (%d/%d)", link, talent.rank,
                                        maxRank, tabName)
+            self.icon.talentTab = talent.tab
+            self.icon.talentIndex = talent.index
             self.icon.rank:SetText(talent.rank)
 
             if (talent.rank < maxRank) then
