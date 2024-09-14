@@ -399,6 +399,8 @@ end
 
 function ts.CreateMainFrame(talentFrame)
     local mainFrame = CreateFrame("Frame", nil, _G[talentFrame], BackdropTemplateMixin and "BackdropTemplate")
+    mainFrame:EnableMouse(true)
+    mainFrame:SetMouseClickEnabled(true)
     mainFrame:SetPoint("CENTER")
     mainFrame:SetSize(128, 128)
     if (not UsingTalented) then
@@ -555,7 +557,9 @@ function ts.CreateMainFrame(talentFrame)
                                             NORMAL_FONT_COLOR.b)
             end
             if (tooltip:IsOwned(self.icon) and self.icon.tooltip) then
-                tooltip:SetText(self.icon.tooltip, nil, nil, nil, nil, true)
+                tooltip:SetTalent(talent.tab, talent.index)
+                tooltip:AddLine(" ", nil, nil, nil)
+                tooltip:AddLine(tooltip, nil, nil, nil)
             end
 
             local iconTexture = _G[self.icon:GetName() .. "IconTexture"]
