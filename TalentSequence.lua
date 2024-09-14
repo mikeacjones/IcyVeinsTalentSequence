@@ -441,8 +441,8 @@ function ts.CreateMainFrame(talentFrame)
 
     local scrollBar = CreateFrame("ScrollFrame", "$parentScrollBar", mainFrame,
                                   "FauxScrollFrameTemplate")
-    scrollBar:SetPoint("TOPLEFT", 0, -8)
-    scrollBar:SetPoint("BOTTOMRIGHT", 0, 8)
+    scrollBar:SetPoint("TOPLEFT", 0, -6)
+    scrollBar:SetPoint("BOTTOMRIGHT", -26, 5)
     scrollBar:SetScript("OnVerticalScroll", function(self, offset)
         FauxScrollFrame_OnVerticalScroll(self, offset, TALENT_ROW_HEIGHT,
                                          function()
@@ -593,7 +593,7 @@ function ts.CreateMainFrame(talentFrame)
     local showButton = CreateFrame("Button", "ShowTalentOrderButton",
                                    _G[talentFrame], "UIPanelButtonTemplate")
     if (not UsingTalented) then
-        showButton:SetPoint("TOPRIGHT", -50, -30)
+        showButton:SetPoint("TOPLEFT", 60, -32)
         showButton:SetHeight(18)
     else
         showButton:SetPoint("TOPRIGHT", -100, -4)
