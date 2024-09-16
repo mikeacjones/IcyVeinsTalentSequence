@@ -135,7 +135,6 @@ function ts:LoadTalentSequence(talents)
 end
 
 function ts:AddTalentCounts()
-    if DLAPI then DLAPI.DebugLog("TalentSequence2", "Adding talent hints", i) end
     local playerLevel = UnitLevel("player")
     local sumTalents = {}
     for index, talent in pairs(ts.Talents) do
@@ -399,7 +398,6 @@ end
 
 -- Creates the sequence frame and attaches it to the talents frame
 function ts.CreateMainFrame()
-    if DLAPI then DLAPI.DebugLog("TalentSequence2", "Creating MainFrame") end
     local mainFrame = CreateFrame("Frame", nil, _G["PlayerTalentFrame"], BackdropTemplateMixin and "BackdropTemplate")
     mainFrame:EnableMouse(true)
     mainFrame:SetMouseClickEnabled(true)
@@ -682,14 +680,11 @@ end
 
 -- Handles the show button being clicked; toggles frame's visibility
 function ts.ShowButton_OnClick(self)
-    if DLAPI then DLAPI.DebugLog("TalentSequence2", "Toggle button clicked") end
     IsTalentSequenceExpanded = not IsTalentSequenceExpanded
     if (IsTalentSequenceExpanded) then
-        if DLAPI then DLAPI.DebugLog("TalentSequence2", "Showing TalentSequence mainFrame") end
         ts.MainFrame:Show()
         self:SetText("  Talent Sequence <<  ")
     else
-        if DLAPI then DLAPI.DebugLog("TalentSequence2", "Hiding TalentSequence mainFrame") end
         ts.MainFrame:Hide()
         self:SetText("  Talent Sequence >>  ")
     end
