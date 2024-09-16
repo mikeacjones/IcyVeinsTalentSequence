@@ -697,13 +697,31 @@ function ts.ShowButton_OnEnter(self)
     tooltip:Show()
 end
 
+local function HookTalentTabs()
+    ts.MainFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
+    ts.MainFrame:SetScript("OnEvent", function(self, event)
+        ts.AddTalentCounts()
+        ts.MainFrame_RefreshTalents()
+    end)
+
+    _G["PlayerSpecTab1"]:HookScript("OnClick", function()
+        if GetActiveTalentGroup(false, false) == 1 then
+            ts.AddTalentCounts()
+        end
+    end)
+    _G["PlayerSpecTab2"]:HookScript("OnClick", function() 
+        if GetActiveTalentGroup(false, false) == 2 then
+            ts.AddTalentCounts()
+        end
+    end)
+    _G["PlayerTalentFrameTab1"]:HookScript("OnClick", function() 
+        ts.AddTalentCounts()
+    end)
+end
 
 local initRun = false
 local function init()
     if (initRun) then return end
-    _G["PlayerTalentFrameTab1"]:HookScript("OnClick", function() 
-        ts.AddTalentCounts()
-    end)
     if (not TalentSequenceTalents) then TalentSequenceTalents = {} end
     if (not TalentSequenceSavedSequences) then
         TalentSequenceSavedSequences = {}
@@ -720,6 +738,7 @@ local function init()
         ts.ShowButton_AddToPanel()
         ts.LoadButton_AddToPanel()
         ts.AddTalentCounts()
+        HookTalentTabs()
     end
     initRun = true
 end
