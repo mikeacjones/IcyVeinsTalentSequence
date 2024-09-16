@@ -150,51 +150,68 @@ function ts:AddTalentCounts()
         end
     end
 
-    for index, desiredTalent in pairs(sumTalents) do
-        local talent = desiredTalent.talent
-        local desiredCount = desiredTalent.desiredCount
-        local name, _, _, _, currentRank, maxRank = GetTalentInfo(talent.tab, talent.index)
+    for tab = 1, GetNumTalentTabs() do
+        for index = 1, GetNumTalents(tab) do
+            local name, _, _, _, currentRank, maxRank = GetTalentInfo(tab, index)
 
-        local prefix = "PlayerTalentFramePanel"..talent.tab.."Talent"..talent.index
-        local talentRankText = _G[prefix.."Rank"]
-        local talentRankBorder = _G[prefix.."RankBorder"]
-        local talentRankBorderGreen = _G[prefix.."RankBorderGreen"]
-        local talentHint = _G[prefix.."Hint"]
+            local k = "T"..tab.."I"..index
+            local prefix = "PlayerTalentFramePanel"..tab.."Talent"..index
+            local talentRankText = _G[prefix.."Rank"]
+            local talentRankBorder = _G[prefix.."RankBorder"]
+            local talentRankBorderGreen = _G[prefix.."RankBorderGreen"]
+            local talentHint = _G[prefix.."Hint"]
 
-        -- talent rank is not at the max we want
-        if desiredCount > 0 and currentRank < desiredCount then
-            local color = "cff999999"
-            if (currentRank == 0 and playerLevel > desiredTalent.counts[1]) or (currentRank > 0 and playerLevel > desiredTalent.counts[currentRank + 1]) then
-                color = "cffff3333"
-            elseif (currentRank > 0 and playerLevel < desiredTalent.counts[currentRank]) then
-                color = "cffaaaaaa"
-            elseif (currentRank > 0 and playerLevel >= desiredTalent.counts[currentRank]) then
-                color = "cff00ff00"
-            end
-            
-            if not talentRankText:IsVisible() then
-                talentRankText:SetText("|"..color..currentRank.."/"..desiredCount.."|r")
-                talentRankText:Show()
-                talentRankBorder:Show()
+            if sumTalents[k] then
+                local desiredTalent = sumTalents[k]
+                local talent = sumTalents[k].talent
+                local desiredCount = sumTalents[k].desiredCount
+                -- talent rank is not at the max we want
+                if desiredCount > 0 and currentRank < desiredCount then
+                    local color = "cff999999"
+                    if (currentRank == 0 and playerLevel > desiredTalent.counts[1]) or (currentRank > 0 and playerLevel > desiredTalent.counts[currentRank + 1]) then
+                        color = "cffff3333"
+                    elseif (currentRank > 0 and playerLevel < desiredTalent.counts[currentRank]) then
+                        color = "cffaaaaaa"
+                    elseif (currentRank > 0 and playerLevel >= desiredTalent.counts[currentRank]) then
+                        color = "cff00ff00"
+                    end
+                    
+                    if not talentRankText:IsVisible() then
+                        talentRankText:SetText("|"..color..currentRank.."/"..desiredCount.."|r")
+                        talentRankText:Show()
+                        talentRankBorder:Show()
+                    else
+                        talentRankText:SetText("|"..color..currentRank.."/"..desiredCount.."|r")
+                    end
+                    talentRankBorder:SetSize(36,18)
+                    talentRankBorderGreen:SetSize(36,18)
+                -- talent rank is at the max we want
+                elseif desiredCount > 0 and currentRank == desiredCount then
+                    talentRankText:SetText("|cffffd700"..currentRank.."/"..desiredCount.."|r")
+                    talentRankBorder:SetSize(36,18)
+                    talentRankBorder:Show()
+                    talentRankBorderGreen:Hide()
+                -- talent rank exceeds the max we want
+                elseif currentRank > desiredCount then
+                    talentRankText:SetText(currentRank.."|cffaaaaaa/|r|cffff0000"..desiredCount.."|r")
+                    talentRankBorder:SetSize(36,18)
+                    talentRankBorderGreen:SetSize(36,18)
+                else
+                    talentRankBorder:SetSize(18,18)
+                    talentRankBorderGreen:SetSize(18,18)
+                end
             else
-                talentRankText:SetText("|"..color..currentRank.."/"..desiredCount.."|r")
+                if currentRank == 0 then
+                    talentRankText:Hide()
+                    talentRankBorder:Hide()
+                    talentRankBorderGreen:Hide()
+                else
+                    talentRankBorder:SetSize(18,18)
+                    talentRankBorderGreen:SetSize(18,18)
+                    talentRankText:SetText("|cffff3333"..currentRank.."|r")
+                    talentRankText:Show()
+                end
             end
-            talentRankBorder:SetSize(36,18)
-            talentRankBorderGreen:SetSize(36,18)
-        -- talent rank is at the max we want
-        elseif desiredCount > 0 and currentRank == desiredCount then
-            talentRankText:SetText("|cffffd700"..currentRank.."/"..desiredCount.."|r")
-            talentRankBorder:SetSize(36,18)
-            talentRankBorder:Show()
-            talentRankBorderGreen:Hide()
-        -- talent rank exceeds the max we want
-        elseif currentRank > desiredCount then
-            talentRankText:SetText(currentRank.."|cffaaaaaa/|r|cffff0000"..desiredCount.."|r")
-            talentRankBorder:SetSize(36,18)
-            talentRankBorderGreen:SetSize(36,18)
-        else
-            talentRankBorder:SetSize(18,18)
-            talentRankBorderGreen:SetSize(18,18)
         end
     end
 end
