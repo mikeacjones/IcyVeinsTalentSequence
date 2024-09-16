@@ -15,9 +15,7 @@ This AddOn is a fork of the original [Talent Sequence](https://www.curseforge.co
 
 ## In-Game Previews
 
-## Blizzard Talent Frame
-
-![Blizzard frame displaying Talent Sequence 2](https://i.imgur.com/BjADJLG.jpeg)
+![Blizzard frame displaying Talent Sequence 2](https://i.imgur.com/elwqFaH.jpeg)
 
 
 ## How-To

@@ -134,6 +134,8 @@ function ts:LoadTalentSequence(talents)
     ts.AddTalentCounts()
 end
 
+-- funciton replaces the text on all the talents which normally show the current rank count, to reflect the current rank / desired count
+-- future talents are in grey, maxed out talents are default color, talents which haven't been learned but should have are red, talents not maxed but in sync are green
 function ts:AddTalentCounts()
     local playerLevel = UnitLevel("player")
     local sumTalents = {}
@@ -159,7 +161,7 @@ function ts:AddTalentCounts()
         local talentRankBorderGreen = _G[prefix.."RankBorderGreen"]
         local talentHint = _G[prefix.."Hint"]
 
-
+        -- talent rank is not at the max we want
         if desiredCount > 0 and currentRank < desiredCount then
             local color = "cff999999"
             if (currentRank == 0 and playerLevel > desiredTalent.counts[1]) or (currentRank > 0 and playerLevel > desiredTalent.counts[currentRank + 1]) then
@@ -179,10 +181,12 @@ function ts:AddTalentCounts()
             end
             talentRankBorder:SetSize(36,18)
             talentRankBorderGreen:SetSize(36,18)
+        -- talent rank is at the max we want
         elseif desiredCount > 0 and currentRank == desiredCount then
             talentRankText:SetText(currentRank.."/"..desiredCount)
             talentRankBorder:SetSize(36,18)
             talentRankBorderGreen:SetSize(36,18)
+        -- talent rank exceeds the max we want
         elseif currentRank > desiredCount then
             talentRankText:SetText(currentRank.."|cffaaaaaa/|r|cffff0000"..desiredCount.."|r")
             talentRankBorder:SetSize(36,18)
@@ -697,13 +701,16 @@ function ts.ShowButton_OnEnter(self)
     tooltip:Show()
 end
 
+-- Hook into talent events
 local function HookTalentTabs()
+    -- Register an event listener for when the user changes specs so we can refresh the talent info
     ts.MainFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
     ts.MainFrame:SetScript("OnEvent", function(self, event)
         ts.AddTalentCounts()
         ts.MainFrame_RefreshTalents()
     end)
 
+    -- when user swaps between their spec1 and spec2 tabs, only fresh the talent info if its the currently active spec
     _G["PlayerSpecTab1"]:HookScript("OnClick", function()
         if GetActiveTalentGroup(false, false) == 1 then
             ts.AddTalentCounts()
@@ -714,6 +721,7 @@ local function HookTalentTabs()
             ts.AddTalentCounts()
         end
     end)
+    -- Update talent count info when the user swaps to the talents tab
     _G["PlayerTalentFrameTab1"]:HookScript("OnClick", function() 
         ts.AddTalentCounts()
     end)
