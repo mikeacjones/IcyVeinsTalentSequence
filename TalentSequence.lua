@@ -183,9 +183,10 @@ function ts:AddTalentCounts()
             talentRankBorderGreen:SetSize(36,18)
         -- talent rank is at the max we want
         elseif desiredCount > 0 and currentRank == desiredCount then
-            talentRankText:SetText(currentRank.."/"..desiredCount)
+            talentRankText:SetText("|cffffd700"..currentRank.."/"..desiredCount.."|r")
             talentRankBorder:SetSize(36,18)
-            talentRankBorderGreen:SetSize(36,18)
+            talentRankBorder:Show()
+            talentRankBorderGreen:Hide()
         -- talent rank exceeds the max we want
         elseif currentRank > desiredCount then
             talentRankText:SetText(currentRank.."|cffaaaaaa/|r|cffff0000"..desiredCount.."|r")
