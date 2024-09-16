@@ -131,6 +131,68 @@ function ts:LoadTalentSequence(talents)
         ts.MainFrame_RefreshTalents()
         ts.MainFrame_JumpToUnlearnedTalents()
     end
+    ts.AddTalentCounts()
+end
+
+function ts:AddTalentCounts()
+    if DLAPI then DLAPI.DebugLog("TalentSequence2", "Adding talent hints", i) end
+    local playerLevel = UnitLevel("player")
+    local sumTalents = {}
+    for index, talent in pairs(ts.Talents) do
+        local k = "T"..talent.tab.."I"..talent.index
+        if sumTalents[k] == nil then
+            sumTalents[k] = { desiredCount = 1, talent = talent, counts = { talent.level }}
+        else
+            curCounts = sumTalents[k]
+            curCounts.desiredCount = curCounts.desiredCount + 1
+            tinsert(curCounts.counts, talent.level)
+        end
+    end
+
+    for index, desiredTalent in pairs(sumTalents) do
+        local talent = desiredTalent.talent
+        local desiredCount = desiredTalent.desiredCount
+        local name, _, _, _, currentRank, maxRank = GetTalentInfo(talent.tab, talent.index)
+
+        local prefix = "PlayerTalentFramePanel"..talent.tab.."Talent"..talent.index
+        local talentRankText = _G[prefix.."Rank"]
+        local talentRankBorder = _G[prefix.."RankBorder"]
+        local talentRankBorderGreen = _G[prefix.."RankBorderGreen"]
+        local talentHint = _G[prefix.."Hint"]
+
+
+        if desiredCount > 0 and currentRank < desiredCount then
+            local color = "cff999999"
+            if (currentRank == 0 and playerLevel > desiredTalent.counts[1]) or (currentRank > 0 and playerLevel > desiredTalent.counts[currentRank + 1]) then
+                color = "cffff3333"
+            elseif (currentRank > 0 and playerLevel < desiredTalent.counts[currentRank]) then
+                color = "cffaaaaaa"
+            elseif (currentRank > 0 and playerLevel >= desiredTalent.counts[currentRank]) then
+                color = "cff00ff00"
+            end
+            
+            if not talentRankText:IsVisible() then
+                talentRankText:SetText("|"..color..currentRank.."/"..desiredCount.."|r")
+                talentRankText:Show()
+                talentRankBorder:Show()
+            else
+                talentRankText:SetText("|"..color..currentRank.."/"..desiredCount.."|r")
+            end
+            talentRankBorder:SetSize(36,18)
+            talentRankBorderGreen:SetSize(36,18)
+        elseif desiredCount > 0 and currentRank == desiredCount then
+            talentRankText:SetText(currentRank.."/"..desiredCount)
+            talentRankBorder:SetSize(36,18)
+            talentRankBorderGreen:SetSize(36,18)
+        elseif currentRank > desiredCount then
+            talentRankText:SetText(currentRank.."|cffaaaaaa/|r|cffff0000"..desiredCount.."|r")
+            talentRankBorder:SetSize(36,18)
+            talentRankBorderGreen:SetSize(36,18)
+        else
+            talentRankBorder:SetSize(18,18)
+            talentRankBorderGreen:SetSize(18,18)
+        end
+    end
 end
 
 -- Updates the list of sequences available on the import frame
@@ -644,6 +706,9 @@ end
 local initRun = false
 local function init()
     if (initRun) then return end
+    _G["PlayerTalentFrameTab1"]:HookScript("OnClick", function() 
+        ts.AddTalentCounts()
+    end)
     if (not TalentSequenceTalents) then TalentSequenceTalents = {} end
     if (not TalentSequenceSavedSequences) then
         TalentSequenceSavedSequences = {}
@@ -659,12 +724,18 @@ local function init()
         ts.MainFrame_AddTalentRows()
         ts.ShowButton_AddToPanel()
         ts.LoadButton_AddToPanel()
+        ts.AddTalentCounts()
     end
     initRun = true
 end
 
 hooksecurefunc("ToggleTalentFrame", function(...)
     if (PlayerTalentFrame == nil) then return end
-    if (initRun) then return end
+    if (initRun) then
+        if PlayerTalentFrame.selectedTab == 1 then
+            ts.AddTalentCounts()
+        end
+        return
+    end
     init()
 end)
