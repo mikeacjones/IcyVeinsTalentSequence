@@ -20,12 +20,9 @@ function ts.CreateDropdown(opts)
     dropdown.default_index = default_index
 
     UIDropDownMenu_SetWidth(dropdown, dropdown_width)
-    UIDropDownMenu_SetText(dropdown, (default_index and default_index > 0) and menu_items[default_index] or title_text)
-
     function dropdown.ddInit(self, level, _)
         if not level then return end
         local info = UIDropDownMenu_CreateInfo()
-        print(level)
         for key, val in pairs(self.menu_items) do
             info.text = val
             info.arg1 = key
@@ -46,7 +43,8 @@ function ts.CreateDropdown(opts)
     end
 
     UIDropDownMenu_Initialize(dropdown, dropdown.ddInit, nil, 1)
-    if default_index then UIDropDownMenu_SetSelectedID(dropdown, default_index) end
+    if default_index and default_index > 0 and default_index <= #menu_items then UIDropDownMenu_SetSelectedID(dropdown, default_index) end
+    UIDropDownMenu_SetText(dropdown, title_text)
 
     function dropdown:Remove(index)
         print(self.checked_index)
