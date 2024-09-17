@@ -128,10 +128,24 @@ function ts:LoadTalentSequence(talents)
         local scrollBar = self.MainFrame.scrollBar
         local numTalents = #ts.Talents
         FauxScrollFrame_Update(scrollBar, numTalents, MAX_TALENT_ROWS, TALENT_ROW_HEIGHT)
-        ts.MainFrame_RefreshTalents()
         ts.MainFrame_JumpToUnlearnedTalents()
     end
     ts.AddTalentCounts()
+end
+
+function ts:ResetTalentHints()
+    for tab = 1, GetNumTalentTabs() do
+        for index = 1, GetNumTalents(tab) do
+            local prefix = "PlayerTalentFramePanel"..tab.."Talent"..index
+            local talentRankText = _G[prefix.."Rank"]
+            local talentRankBorder = _G[prefix.."RankBorder"]
+            local talentRankBorderGreen = _G[prefix.."RankBorderGreen"]
+            local talentHint = _G[prefix.."Hint"]
+
+            talentRankBorder:SetSize(18,18)
+            talentRankBorderGreen:SetSize(18,18)
+        end
+    end
 end
 
 -- funciton replaces the text on all the talents which normally show the current rank count, to reflect the current rank / desired count
@@ -197,8 +211,8 @@ function ts:AddTalentCounts()
                     talentRankBorder:SetSize(36,18)
                     talentRankBorderGreen:SetSize(36,18)
                 else
-                    talentRankBorder:SetSize(18,18)
-                    talentRankBorderGreen:SetSize(18,18)
+                    --talentRankBorder:SetSize(18,18)
+                    --talentRankBorderGreen:SetSize(18,18)
                 end
             else
                 if currentRank == 0 then
@@ -210,6 +224,8 @@ function ts:AddTalentCounts()
                     talentRankBorderGreen:SetSize(18,18)
                     talentRankText:SetText("|cffff3333"..currentRank.."|r")
                     talentRankText:Show()
+                    talentRankBorder:Show()
+                    talentRankBorderGreen:Hide()
                 end
             end
         end
@@ -452,7 +468,7 @@ function ts.CreateMainFrame()
         if (((event == "CHARACTER_POINTS_CHANGED") or
             (event == "SPELLS_CHANGED")) and self:IsVisible()) then
             ts.MainFrame_JumpToUnlearnedTalents()
-            ts.MainFrame_RefreshTalents()
+            --ts.MainFrame_RefreshTalents()
         end
     end)
     
@@ -725,18 +741,22 @@ local function HookTalentTabs()
     ts.MainFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
     ts.MainFrame:SetScript("OnEvent", function(self, event)
         ts.AddTalentCounts()
-        ts.MainFrame_RefreshTalents()
+        ts.MainFrame_JumpToUnlearnedTalents()
     end)
 
     -- when user swaps between their spec1 and spec2 tabs, only fresh the talent info if its the currently active spec
     _G["PlayerSpecTab1"]:HookScript("OnClick", function()
         if GetActiveTalentGroup(false, false) == 1 then
             ts.AddTalentCounts()
+        else
+            ts.ResetTalentHints()
         end
     end)
     _G["PlayerSpecTab2"]:HookScript("OnClick", function() 
         if GetActiveTalentGroup(false, false) == 2 then
             ts.AddTalentCounts()
+        else
+            ts.ResetTalentHints()
         end
     end)
     -- Update talent count info when the user swaps to the talents tab
@@ -772,7 +792,7 @@ end
 hooksecurefunc("ToggleTalentFrame", function(...)
     if (PlayerTalentFrame == nil) then return end
     if (initRun) then
-        if PlayerTalentFrame.selectedTab == 1 then
+        if PlayerTalentFrame.selectedTab == 1 and GetActiveTalentGroup(false, false) == PlayerTalentFrame.talentGroup then
             ts.AddTalentCounts()
         end
         return
