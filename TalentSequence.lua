@@ -128,6 +128,7 @@ function ts:LoadTalentSequence(talents)
         local scrollBar = self.MainFrame.scrollBar
         local numTalents = #ts.Talents
         FauxScrollFrame_Update(scrollBar, numTalents, MAX_TALENT_ROWS, TALENT_ROW_HEIGHT)
+        --ts.MainFrame_RefreshTalents()
         ts.MainFrame_JumpToUnlearnedTalents()
     end
     ts.AddTalentCounts()
@@ -250,7 +251,7 @@ function ts.CreateImportFrame()
     local sequencesFrame = CreateFrame("Frame", "TalentSequences", UIParent, "BasicFrameTemplateWithInset")
     sequencesFrame:Hide()
     sequencesFrame:SetScript("OnShow", function() ts:UpdateSequencesFrame() end)
-    sequencesFrame:SetSize(325, 212)
+    sequencesFrame:SetSize(325, 312)
     sequencesFrame:SetPoint("CENTER")
     sequencesFrame:SetMovable(true)
     sequencesFrame:SetClampedToScreen(true)
@@ -261,15 +262,53 @@ function ts.CreateImportFrame()
         for _, row in ipairs(self.rows) do row:SetForLoad() end
     end
     tinsert(UISpecialFrames, "TalentSequences")
-    local scrollBar = CreateFrame("ScrollFrame", "$parentScrollBar",
-                                  sequencesFrame, "FauxScrollFrameTemplate")
-    scrollBar:SetPoint("TOPLEFT", sequencesFrame.InsetBg, "TOPLEFT", 5, -6)
+    local scrollBar = CreateFrame("ScrollFrame", "$parentScrollBar", sequencesFrame, "FauxScrollFrameTemplate")
+    scrollBar:SetPoint("TOPLEFT", sequencesFrame.InsetBg, "TOPLEFT", 5, -60)
     scrollBar:SetPoint("BOTTOMRIGHT", sequencesFrame.InsetBg, "BOTTOMRIGHT", -28, 28)
 
     sequencesFrame.scrollBar = scrollBar
 
-    local importButton = CreateFrame("Button", nil, sequencesFrame,
-                                     "UIPanelButtonTemplate")
+    local talent1Label = sequencesFrame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+    talent1Label:SetPoint("TOPLEFT", sequencesFrame, "TOPLEFT", 10, -35)
+    talent1Label:SetText("Active with Primary Spec:")
+    local talent1DropDown = CreateFrame("Frame", "talent1dropdown", sequencesFrame, "UIDropDownMenuTemplate")
+    UIDropDownMenu_SetText(talent1DropDown, "- no sequence -")
+    talent1DropDown:SetPoint("TOPRIGHT", sequencesFrame, "TOPRIGHT", 0, -25)
+    UIDropDownMenu_SetWidth(talent1DropDown, 135)
+    UIDropDownMenu_Initialize(talent1DropDown, function(self, level, menuList)
+        local info = UIDropDownMenu_CreateInfo()
+        for i, sequence in ipairs(TalentSequenceSavedSequences) do
+            info.text, info.arg1, info.checked, info.func = sequence.name, i, false, function(self, arg1, arg2, checked)
+                DevTools_Dump("CLICK")
+                self.checked = true
+                TalentSequence1 = arg1
+            end
+            UIDropDownMenu_AddButton(info)
+            UIDropDownMenu_SetText(talent1DropDown, self.text)
+        end
+    end)
+
+    local talent2Label = sequencesFrame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+    talent2Label:SetPoint("TOPLEFT", sequencesFrame, "TOPLEFT", 10, -60)
+    talent2Label:SetText("Active with Secondary Spec:")
+    local talent2DropDown = CreateFrame("Frame", "talent2dropdown", sequencesFrame, "UIDropDownMenuTemplate")
+    UIDropDownMenu_SetText(talent2DropDown, "- no sequence -")
+    talent2DropDown:SetPoint("TOPRIGHT", sequencesFrame, "TOPRIGHT", 0, -50)
+    UIDropDownMenu_SetWidth(talent2DropDown, 135)
+    UIDropDownMenu_Initialize(talent2DropDown, function(self, level, menuList)
+        local info = UIDropDownMenu_CreateInfo()
+        for i, sequence in ipairs(TalentSequenceSavedSequences) do
+            info.text, info.arg1, info.checked, info.func = sequence.name, i, false, function(self, arg1, arg2, checked)
+                DevTools_Dump("CLICK")
+                self.checked = true
+                TalentSequence2 = arg1
+                UIDropDownMenu_SetText(talent2DropDown, self.text)
+            end
+            UIDropDownMenu_AddButton(info)
+        end
+    end)
+
+    local importButton = CreateFrame("Button", nil, sequencesFrame, "UIPanelButtonTemplate")
     importButton:SetPoint("BOTTOM", 0, 8)
     importButton:SetSize(75, 24)
     importButton:SetText("Import")
@@ -292,14 +331,12 @@ function ts.CreateImportFrame()
         nameInput:SetWidth(150)
         nameInput:SetAutoFocus(false)
 
-        local namedLoadButton = CreateFrame("Button", nil, row,
-                                            "UIPanelButtonTemplate")
+        local namedLoadButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
         namedLoadButton:SetPoint("TOPLEFT", nameInput, "TOPLEFT", -6, 0)
         namedLoadButton:SetPoint("BOTTOMRIGHT", nameInput, "BOTTOMRIGHT")
         nameInput:Hide()
 
-        local talentAmountString = row:CreateFontString(nil, "ARTWORK",
-                                                        "GameFontWhite")
+        local talentAmountString = row:CreateFontString(nil, "ARTWORK", "GameFontWhite")
         talentAmountString:SetPoint("LEFT", nameInput, "RIGHT")
 
         function row:SetSequence(sequence)
@@ -347,8 +384,7 @@ function ts.CreateImportFrame()
             local offset = FauxScrollFrame_GetOffset(scrollBar)
             local index = offset + self:GetParent().index
             local inputText = self:GetText()
-            local newName = (inputText and inputText ~= "") and inputText or
-                            ts.L.UNNAMED
+            local newName = (inputText and inputText ~= "") and inputText or ts.L.UNNAMED
             TalentSequenceSavedSequences[index].name = newName
             namedLoadButton:Show()
             self:Hide()
@@ -423,12 +459,13 @@ function ts.CreateImportFrame()
     end
     sequencesFrame.rows = rows
 
-    scrollBar:SetScript("OnVerticalScroll", function(self, offset)
-        FauxScrollFrame_OnVerticalScroll(self, offset, SEQUENCES_ROW_HEIGHT,
-                                         function()
-            ts:UpdateSequencesFrame()
+    scrollBar:SetScript("OnVerticalScroll", 
+        function(self, offset)
+            FauxScrollFrame_OnVerticalScroll(self, offset, SEQUENCES_ROW_HEIGHT,
+            function()
+                ts:UpdateSequencesFrame()
+            end)
         end)
-    end)
     scrollBar:SetScript("OnShow", function() ts:UpdateSequencesFrame() end)
 
     ts.ImportFrame = sequencesFrame
@@ -468,7 +505,6 @@ function ts.CreateMainFrame()
         if (((event == "CHARACTER_POINTS_CHANGED") or
             (event == "SPELLS_CHANGED")) and self:IsVisible()) then
             ts.MainFrame_JumpToUnlearnedTalents()
-            --ts.MainFrame_RefreshTalents()
         end
     end)
     
