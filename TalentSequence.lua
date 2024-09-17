@@ -68,7 +68,7 @@ local function InsertSequence(talentSequence)
         tabTotals[talent.tab] = tabTotals[talent.tab] + 1
     end
     local points = string.format("%d/%d/%d", unpack(tabTotals))
-    tinsert(TalentSequenceSavedSequences, 1, {name = "<unnamed>", talents = talentSequence, points = points})
+    table.insert(TalentSequenceSavedSequences, {name = "<unnamed>", talents = talentSequence, points = points})
 end
 
 -- Loads the dictionary with all of the available talents for the user; used when parsing the wowhead / icyveins strings
@@ -115,7 +115,7 @@ function ts:ImportTalents(talentsString)
         FauxScrollFrame_SetOffset(scrollBar, 0)
         FauxScrollFrame_OnVerticalScroll(scrollBar, 0, SEQUENCES_ROW_HEIGHT)
         ts:UpdateSequencesFrame()
-        ts.ImportFrame.rows[1]:SetForRename()
+        ts.ImportFrame.rows[#TalentSequenceSavedSequences]:SetForRename()
     end
 end
 
@@ -128,6 +128,7 @@ function ts:LoadTalentSequence(talents)
         local scrollBar = self.MainFrame.scrollBar
         local numTalents = #ts.Talents
         FauxScrollFrame_Update(scrollBar, numTalents, MAX_TALENT_ROWS, TALENT_ROW_HEIGHT)
+        ts.MainFrame_RefreshTalents()
         ts.MainFrame_JumpToUnlearnedTalents()
     end
     ts.AddTalentCounts()
@@ -151,6 +152,10 @@ end
 -- funciton replaces the text on all the talents which normally show the current rank count, to reflect the current rank / desired count
 -- future talents are in grey, maxed out talents are default color, talents which haven't been learned but should have are red, talents not maxed but in sync are green
 function ts:AddTalentCounts()
+    if PlayerTalentFrame.talentGroup ~= GetActiveTalentGroup(false, false) then
+        ts:ResetTalentHints()
+        return
+    end
     local playerLevel = UnitLevel("player")
     local sumTalents = {}
     for index, talent in pairs(ts.Talents) do
@@ -250,7 +255,7 @@ function ts.CreateImportFrame()
     local sequencesFrame = CreateFrame("Frame", "TalentSequences", UIParent, "BasicFrameTemplateWithInset")
     sequencesFrame:Hide()
     sequencesFrame:SetScript("OnShow", function() ts:UpdateSequencesFrame() end)
-    sequencesFrame:SetSize(325, 212)
+    sequencesFrame:SetSize(325, 312)
     sequencesFrame:SetPoint("CENTER")
     sequencesFrame:SetMovable(true)
     sequencesFrame:SetClampedToScreen(true)
@@ -261,15 +266,52 @@ function ts.CreateImportFrame()
         for _, row in ipairs(self.rows) do row:SetForLoad() end
     end
     tinsert(UISpecialFrames, "TalentSequences")
-    local scrollBar = CreateFrame("ScrollFrame", "$parentScrollBar",
-                                  sequencesFrame, "FauxScrollFrameTemplate")
-    scrollBar:SetPoint("TOPLEFT", sequencesFrame.InsetBg, "TOPLEFT", 5, -6)
+    local scrollBar = CreateFrame("ScrollFrame", "$parentScrollBar", sequencesFrame, "FauxScrollFrameTemplate")
+    scrollBar:SetPoint("TOPLEFT", sequencesFrame.InsetBg, "TOPLEFT", 5, -60)
     scrollBar:SetPoint("BOTTOMRIGHT", sequencesFrame.InsetBg, "BOTTOMRIGHT", -28, 28)
 
     sequencesFrame.scrollBar = scrollBar
+    local sequenceNames = {} for _, obj in ipairs(TalentSequenceSavedSequences) do table.insert(sequenceNames, obj.name) end
 
-    local importButton = CreateFrame("Button", nil, sequencesFrame,
-                                     "UIPanelButtonTemplate")
+    -- Create the dropdown for player's primary spec
+    local talent1Label = sequencesFrame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+    talent1Label:SetPoint("TOPLEFT", sequencesFrame, "TOPLEFT", 10, -35)
+    talent1Label:SetText("Active with Primary Spec:")
+    local talent1opts = {
+        ['name']='talent1dd',
+        ['parent']=sequencesFrame,
+        ['title']='',
+        ['items']= sequenceNames,
+        ['width']=135,
+        ['defaultIndex']= (SpecSequenceIndex and SpecSequenceIndex[1] and SpecSequenceIndex[1] > 0 and SpecSequenceIndex[1] <= #TalentSequenceSavedSequences) and SpecSequenceIndex[1] or 0, 
+        ['changeFunc']=function(dropdown_frame, dropdown_val, arg1)
+            if not SpecSequenceIndex then SpecSequenceIndex = {} end
+            SpecSequenceIndex[1] = arg1
+        end
+    }
+    talent1DropDown = ts.CreateDropdown(talent1opts)
+    talent1DropDown:SetPoint("TOPRIGHT", sequencesFrame, "TOPRIGHT", 0, -25)
+
+    -- Create the dropdown for the player's secondary spec
+    local talent2Label = sequencesFrame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+    talent2Label:SetPoint("TOPLEFT", sequencesFrame, "TOPLEFT", 10, -60)
+    talent2Label:SetText("Active with Secondary Spec:")
+    local talent2opts = {
+        ['name']='talent2dd',
+        ['parent']=sequencesFrame,
+        ['title']='',
+        ['items']= sequenceNames,
+        ['width']=135,
+        ['defaultIndex']= (SpecSequenceIndex and SpecSequenceIndex[2] and SpecSequenceIndex[2] > 0 and SpecSequenceIndex[2] <= #TalentSequenceSavedSequences) and SpecSequenceIndex[2] or 0, 
+        ['changeFunc']=function(dropdown_frame, dropdown_val, arg1)
+            if not SpecSequenceIndex then SpecSequenceIndex = {} end
+            SpecSequenceIndex[2] = arg1
+        end
+    }
+    local talent2DropDown = ts.CreateDropdown(talent2opts)
+    talent2DropDown:SetPoint("TOPRIGHT", sequencesFrame, "TOPRIGHT", 0, -50)
+
+    local importButton = CreateFrame("Button", nil, sequencesFrame, "UIPanelButtonTemplate")
     importButton:SetPoint("BOTTOM", 0, 8)
     importButton:SetSize(75, 24)
     importButton:SetText("Import")
@@ -292,14 +334,12 @@ function ts.CreateImportFrame()
         nameInput:SetWidth(150)
         nameInput:SetAutoFocus(false)
 
-        local namedLoadButton = CreateFrame("Button", nil, row,
-                                            "UIPanelButtonTemplate")
+        local namedLoadButton = CreateFrame("Button", nil, row, "UIPanelButtonTemplate")
         namedLoadButton:SetPoint("TOPLEFT", nameInput, "TOPLEFT", -6, 0)
         namedLoadButton:SetPoint("BOTTOMRIGHT", nameInput, "BOTTOMRIGHT")
         nameInput:Hide()
 
-        local talentAmountString = row:CreateFontString(nil, "ARTWORK",
-                                                        "GameFontWhite")
+        local talentAmountString = row:CreateFontString(nil, "ARTWORK", "GameFontWhite")
         talentAmountString:SetPoint("LEFT", nameInput, "RIGHT")
 
         function row:SetSequence(sequence)
@@ -347,12 +387,15 @@ function ts.CreateImportFrame()
             local offset = FauxScrollFrame_GetOffset(scrollBar)
             local index = offset + self:GetParent().index
             local inputText = self:GetText()
-            local newName = (inputText and inputText ~= "") and inputText or
-                            ts.L.UNNAMED
+            local newName = (inputText and inputText ~= "") and inputText or ts.L.UNNAMED
             TalentSequenceSavedSequences[index].name = newName
+
             namedLoadButton:Show()
             self:Hide()
             ts:UpdateSequencesFrame()
+            sequenceNames = {} for _, obj in ipairs(TalentSequenceSavedSequences) do table.insert(sequenceNames, obj.name) end
+            talent1DropDown:Update(sequenceNames)
+            talent2DropDown:Update(sequenceNames)
         end)
         namedLoadButton:SetScript("OnEnter", function(self)
             tooltip:SetOwner(self, "ANCHOR_RIGHT")
@@ -363,6 +406,7 @@ function ts.CreateImportFrame()
         namedLoadButton:SetScript("OnClick", function(self)
             local offset = FauxScrollFrame_GetOffset(scrollBar)
             local index = offset + self:GetParent().index
+            TalentSequenceTalentsIndex = index
             local sequence = TalentSequenceSavedSequences[index]
             ts:LoadTalentSequence(sequence.talents)
         end)
@@ -392,6 +436,14 @@ function ts.CreateImportFrame()
             if (not IsShiftKeyDown()) then return end
             local offset = FauxScrollFrame_GetOffset(scrollBar)
             local index = offset + self:GetParent().index
+            for i, si in ipairs(SpecSequenceIndex) do
+                if si == index then SpecSequenceIndex[i] = nil end
+                if si > index then SpecSequenceIndex[i] = si - 1 end
+            end
+            if TalentSequenceTalentsIndex and TalentSequenceTalentsIndex == index then TalentSequenceTalentsIndex = nil end
+            if TalentSequenceTalentsIndex and TalentSequenceTalentsIndex > index then TalentSequenceTalentsIndex = TalentSequenceTalentsIndex - 1 end
+            talent1DropDown:Remove(index)
+            talent2DropDown:Remove(index)
             tremove(TalentSequenceSavedSequences, index)
             ts:UpdateSequencesFrame()
         end)
@@ -423,12 +475,13 @@ function ts.CreateImportFrame()
     end
     sequencesFrame.rows = rows
 
-    scrollBar:SetScript("OnVerticalScroll", function(self, offset)
-        FauxScrollFrame_OnVerticalScroll(self, offset, SEQUENCES_ROW_HEIGHT,
-                                         function()
-            ts:UpdateSequencesFrame()
+    scrollBar:SetScript("OnVerticalScroll", 
+        function(self, offset)
+            FauxScrollFrame_OnVerticalScroll(self, offset, SEQUENCES_ROW_HEIGHT,
+            function()
+                ts:UpdateSequencesFrame()
+            end)
         end)
-    end)
     scrollBar:SetScript("OnShow", function() ts:UpdateSequencesFrame() end)
 
     ts.ImportFrame = sequencesFrame
@@ -444,7 +497,7 @@ function ts.CreateMainFrame()
     mainFrame:SetPoint("TOPLEFT", "PlayerTalentFrame", "TOPRIGHT", 0, -130)
     mainFrame:SetPoint("BOTTOMLEFT", "PlayerTalentFrame", "BOTTOMRIGHT", 0, 18)
     mainFrame:SetBackdrop({
-        bgFile = "Interface\\FrameGeneral\\UI-Background-Marble",
+        bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
         tile = true,
         tileSize = 16,
@@ -468,7 +521,6 @@ function ts.CreateMainFrame()
         if (((event == "CHARACTER_POINTS_CHANGED") or
             (event == "SPELLS_CHANGED")) and self:IsVisible()) then
             ts.MainFrame_JumpToUnlearnedTalents()
-            --ts.MainFrame_RefreshTalents()
         end
     end)
     
@@ -740,25 +792,18 @@ local function HookTalentTabs()
     -- Register an event listener for when the user changes specs so we can refresh the talent info
     ts.MainFrame:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED")
     ts.MainFrame:SetScript("OnEvent", function(self, event)
-        ts.AddTalentCounts()
+        local currentSpecIndex = GetActiveTalentGroup(false, false)
+        if SpecSequenceIndex and SpecSequenceIndex[currentSpecIndex] then
+            ts:LoadTalentSequence(TalentSequenceSavedSequences[SpecSequenceIndex[currentSpecIndex]].talents)
+        end
+
+        ts:AddTalentCounts()
         ts.MainFrame_JumpToUnlearnedTalents()
     end)
 
     -- when user swaps between their spec1 and spec2 tabs, only fresh the talent info if its the currently active spec
-    _G["PlayerSpecTab1"]:HookScript("OnClick", function()
-        if GetActiveTalentGroup(false, false) == 1 then
-            ts.AddTalentCounts()
-        else
-            ts.ResetTalentHints()
-        end
-    end)
-    _G["PlayerSpecTab2"]:HookScript("OnClick", function() 
-        if GetActiveTalentGroup(false, false) == 2 then
-            ts.AddTalentCounts()
-        else
-            ts.ResetTalentHints()
-        end
-    end)
+    _G["PlayerSpecTab1"]:HookScript("OnClick", ts.AddTalentCounts)
+    _G["PlayerSpecTab2"]:HookScript("OnClick", ts.AddTalentCounts)
     -- Update talent count info when the user swaps to the talents tab
     _G["PlayerTalentFrameTab1"]:HookScript("OnClick", function() 
         ts.AddTalentCounts()
@@ -768,13 +813,17 @@ end
 local initRun = false
 local function init()
     if (initRun) then return end
-    if (not TalentSequenceTalents) then TalentSequenceTalents = {} end
     if (not TalentSequenceSavedSequences) then
         TalentSequenceSavedSequences = {}
     end
-    if (#TalentSequenceTalents > 0 and #TalentSequenceSavedSequences == 0) then
-        InsertSequence(TalentSequenceTalents)
+    local currentSpecIndex = GetActiveTalentGroup(false, false)
+
+    if (TalentSequenceTalentsIndex and TalentSequenceTalentsIndex > 0 and TalentSequenceTalentsIndex <= #TalentSequenceSavedSequences) then
+        TalentSequenceTalents = TalentSequenceSavedSequences[TalentSequenceTalentsIndex].talents
+    elseif SpecSequenceIndex and SpecSequenceIndex[currentSpecIndex] and TalentSequenceSavedSequences[SpecSequenceIndex[currentSpecIndex]] then
+        TalentSequenceTalents = TalentSequenceSavedSequences[SpecSequenceIndex[currentSpecIndex]].talents
     end
+    if (not TalentSequenceTalents) then TalentSequenceTalents = {} end
     ts.Talents = TalentSequenceTalents
     if (IsTalentSequenceExpanded == 0) then IsTalentSequenceExpanded = false end
     if (ts.MainFrame == nil) then 
