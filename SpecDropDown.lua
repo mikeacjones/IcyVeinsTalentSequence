@@ -18,10 +18,12 @@ function ts.CreateDropdown(opts)
     dropdown.menu_items = menu_items
     dropdown.title_text = title_text
     dropdown.default_index = default_index
+    dropdown.dropdown_name = dropdown_name
 
     UIDropDownMenu_SetWidth(dropdown, dropdown_width)
     function dropdown.ddInit(self, level, _)
         if not level then return end
+
         local info = UIDropDownMenu_CreateInfo()
         for key, val in pairs(self.menu_items) do
             info.text = val
@@ -38,16 +40,20 @@ function ts.CreateDropdown(opts)
                 self.checked_index = arg1
                 change_func(self, self2.value, arg1)
             end
+
             UIDropDownMenu_AddButton(info, level)
         end
     end
 
     UIDropDownMenu_Initialize(dropdown, dropdown.ddInit, nil, 1)
-    if default_index and default_index > 0 and default_index <= #menu_items then UIDropDownMenu_SetSelectedID(dropdown, default_index) end
-    UIDropDownMenu_SetText(dropdown, title_text)
+    if default_index and default_index > 0 and default_index <= #menu_items then 
+        UIDropDownMenu_SetSelectedID(dropdown, default_index)
+        UIDropDownMenu_SetText(dropdown, menu_items[default_index])
+    else
+        UIDropDownMenu_SetText(dropdown, title_text)
+    end
 
     function dropdown:Remove(index)
-        print(self.checked_index)
         if self.checked_index and self.checked_index == index then 
             self.default_index = nil
             self.checked_index = nil
