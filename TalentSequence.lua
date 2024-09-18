@@ -68,7 +68,7 @@ local function InsertSequence(talentSequence)
         tabTotals[talent.tab] = tabTotals[talent.tab] + 1
     end
     local points = string.format("%d/%d/%d", unpack(tabTotals))
-    table.insert(TalentSequenceSavedSequences, {name = "<unnamed>", talents = talentSequence, points = points})
+    table.insert(TalentSequenceSavedSequences, 1, {name = "<unnamed>", talents = talentSequence, points = points})
 end
 
 -- Loads the dictionary with all of the available talents for the user; used when parsing the wowhead / icyveins strings
@@ -110,12 +110,22 @@ function ts:ImportTalents(talentsString)
     end
     if (talents == nil) then return end
     InsertSequence(talents)
+
+    if SpecSequenceIndex then
+        for i, si in ipairs(SpecSequenceIndex) do
+            if SpecSequenceIndex[i] and SpecSequenceIndex[i] > 0 then
+                SpecSequenceIndex[i] = SpecSequenceIndex[i] + 1
+            end
+        end
+    end
+    if TalentSequenceTalentsIndex and TalentSequenceTalentsIndex > 0 then TalentSequenceTalentsIndex = TalentSequenceTalentsIndex + 1 end
+
     if (self.ImportFrame and self.ImportFrame:IsShown()) then
         local scrollBar = self.ImportFrame.scrollBar
         FauxScrollFrame_SetOffset(scrollBar, 0)
         FauxScrollFrame_OnVerticalScroll(scrollBar, 0, SEQUENCES_ROW_HEIGHT)
         ts:UpdateSequencesFrame()
-        ts.ImportFrame.rows[#TalentSequenceSavedSequences]:SetForRename()
+        ts.ImportFrame.rows[1]:SetForRename()
     end
 end
 
@@ -283,7 +293,7 @@ function ts.CreateImportFrame()
         ['title']='',
         ['items']= sequenceNames,
         ['width']=135,
-        ['defaultIndex']= (SpecSequenceIndex and SpecSequenceIndex[1] and SpecSequenceIndex[1] > 0 and SpecSequenceIndex[1] <= #TalentSequenceSavedSequences) and SpecSequenceIndex[1] or 0, 
+        ['defaultIndex']= (SpecSequenceIndex and SpecSequenceIndex[1] and SpecSequenceIndex[1] > 0 and SpecSequenceIndex[1] <= #TalentSequenceSavedSequences) and SpecSequenceIndex[1] or nil, 
         ['changeFunc']=function(dropdown_frame, dropdown_val, arg1)
             if not SpecSequenceIndex then SpecSequenceIndex = {} end
             SpecSequenceIndex[1] = arg1
@@ -302,7 +312,7 @@ function ts.CreateImportFrame()
         ['title']='',
         ['items']= sequenceNames,
         ['width']=135,
-        ['defaultIndex']= (SpecSequenceIndex and SpecSequenceIndex[2] and SpecSequenceIndex[2] > 0 and SpecSequenceIndex[2] <= #TalentSequenceSavedSequences) and SpecSequenceIndex[2] or 0, 
+        ['defaultIndex']= (SpecSequenceIndex and SpecSequenceIndex[2] and SpecSequenceIndex[2] > 0 and SpecSequenceIndex[2] <= #TalentSequenceSavedSequences) and SpecSequenceIndex[2] or nil, 
         ['changeFunc']=function(dropdown_frame, dropdown_val, arg1)
             if not SpecSequenceIndex then SpecSequenceIndex = {} end
             SpecSequenceIndex[2] = arg1
@@ -436,9 +446,14 @@ function ts.CreateImportFrame()
             if (not IsShiftKeyDown()) then return end
             local offset = FauxScrollFrame_GetOffset(scrollBar)
             local index = offset + self:GetParent().index
-            for i, si in ipairs(SpecSequenceIndex) do
-                if si == index then SpecSequenceIndex[i] = nil end
-                if si > index then SpecSequenceIndex[i] = si - 1 end
+
+            if SpecSequenceIndex[1] then
+                if SpecSequenceIndex[1] == index then SpecSequenceIndex[1] = nil
+                elseif SpecSequenceIndex[1] > index then SpecSequenceIndex[1] = SpecSequenceIndex[1] - 1 end
+            end
+            if SpecSequenceIndex[2] then
+                if SpecSequenceIndex[2] == index then SpecSequenceIndex[2] = nil
+                elseif SpecSequenceIndex[2] > index then SpecSequenceIndex[2] = SpecSequenceIndex[2] - 1 end
             end
             if TalentSequenceTalentsIndex and TalentSequenceTalentsIndex == index then TalentSequenceTalentsIndex = nil end
             if TalentSequenceTalentsIndex and TalentSequenceTalentsIndex > index then TalentSequenceTalentsIndex = TalentSequenceTalentsIndex - 1 end
